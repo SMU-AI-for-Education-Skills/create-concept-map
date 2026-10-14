@@ -1,0 +1,67 @@
+name: Publish Skill
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Release version, e.g. v1.0.0"
+        required: true
+        default: "v1.0.0"
+
+permissions:
+  contents: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Get Skill name
+        id: repo
+        shell: bash
+        run: |
+          echo "name=${GITHUB_REPOSITORY#*/}" >> "$GITHUB_OUTPUT"
+
+      - name: Validate required files
+        shell: bash
+        run: |
+          if [ ! -f "SKILL.md" ]; then
+            echo "ERROR: SKILL.md is required."
+            exit 1
+          fi
+
+      - name: Build clean Skill ZIP
+        shell: bash
+        run: |
+          SKILL_NAME="${{ steps.repo.outputs.name }}"
+
+          mkdir -p "package/$SKILL_NAME"
+
+          rsync -av \
+            --exclude='.git/' \
+            --exclude='.github/' \
+            --exclude='package/' \
+            --exclude='*.zip' \
+            --exclude='.env' \
+            --exclude='.env.*' \
+            ./ "package/$SKILL_NAME/"
+
+          cd package
+          zip -r "../${SKILL_NAME}.zip" "$SKILL_NAME"
+
+      - name: Create release
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          VERSION="${{ inputs.version }}"
+          SKILL_NAME="${{ steps.repo.outputs.name }}"
+
+          gh release create "$VERSION" \
+            "${SKILL_NAME}.zip" \
+            --target "${{ github.sha }}" \
+            --title "${SKILL_NAME} ${VERSION}" \
+            --generate-notes

@@ -1,0 +1,105 @@
+name: Validate Skill
+
+on:
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Check SKILL.md exists
+        shell: bash
+        run: |
+          if [ ! -f "SKILL.md" ]; then
+            echo "ERROR: SKILL.md is required."
+            exit 1
+          fi
+
+      - name: Validate SKILL.md frontmatter
+        shell: python
+        run: |
+          from pathlib import Path
+          import sys
+
+          path = Path("SKILL.md")
+          text = path.read_text(encoding="utf-8")
+
+          if not text.startswith("---"):
+              print("ERROR: SKILL.md must begin with YAML frontmatter.")
+              sys.exit(1)
+
+          parts = text.split("---", 2)
+
+          if len(parts) < 3:
+              print("ERROR: SKILL.md YAML frontmatter is not properly closed.")
+              sys.exit(1)
+
+          frontmatter = parts[1]
+
+          required_fields = ["name:", "description:"]
+
+          missing = [
+              field[:-1]
+              for field in required_fields
+              if field not in frontmatter
+          ]
+
+          if missing:
+              print(
+                  "ERROR: Missing required frontmatter field(s): "
+                  + ", ".join(missing)
+              )
+              sys.exit(1)
+
+          print("SKILL.md frontmatter looks valid.")
+
+      - name: Validate Skill name
+        shell: python
+        run: |
+          from pathlib import Path
+          import re
+          import sys
+
+          text = Path("SKILL.md").read_text(encoding="utf-8")
+          frontmatter = text.split("---", 2)[1]
+
+          match = re.search(r"^name:\s*(.+)$", frontmatter, re.MULTILINE)
+
+          if not match:
+              print("ERROR: Could not read Skill name.")
+              sys.exit(1)
+
+          name = match.group(1).strip().strip("\"'")
+
+          if not re.fullmatch(r"[a-z0-9-]+", name):
+              print(
+                  "ERROR: Skill name must contain only "
+                  "lowercase letters, numbers, and hyphens."
+              )
+              sys.exit(1)
+
+          print(f"Skill name is valid: {name}")
+
+      - name: Check optional directories
+        shell: bash
+        run: |
+          for dir in agents references scripts assets; do
+            if [ -e "$dir" ] && [ ! -d "$dir" ]; then
+              echo "ERROR: $dir exists but is not a directory."
+              exit 1
+            fi
+          done
+
+          echo "Optional directory structure is valid."
+
+      - name: Validation complete
+        shell: bash
+        run: |
+          echo "Skill validation passed."
