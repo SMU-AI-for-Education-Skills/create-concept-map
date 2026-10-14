@@ -1,44 +1,20 @@
 ## Purpose
-<!--
-Describe what this skill does, the problem it addresses, and who it is intended for. Keep to one or two paragraphs.
--->
+Guides the process of creating concept maps out of text(s) provided by the user. Concept maps are generated as standalone HTML files, with options to produce fully fleshed-out maps as supplementary material, or deliberately including gaps and blanks as learning activities. To aid learning, maps are interactive and editable, and include the option to save the edited versions.
 
 ## Using the skill 
 You may download the latest version of this skill as a ZIP file under `Releases` on the right of this Github Repository. You may refer to our guide to learn how to [use this skill within your AI tools](https://github.com/SMU-AI-for-Education-Skills#accessing-and-using-skills). 
 
 ## How this works
-<!--
-Describe how this skill works in terms of the process or workflow. Keep to one paragraph or several points.
--->
+Takes a text (web article, research paper, etc.) and provides options for the type of concept map to produce (fully written out as supplementary material or with deliberate blanks and gaps as exercises). The skill includes instructions to modify the concept map generated based on the discipline the provided text belongs to. Generates a single standalone HTML file that is portable and can be shared with students.
 
 ## Inputs Required
-<!--
-List what the skill requires the instructor to provide.
-Example:
-- Topic or concept to be assessed
-- Relevant learning outcomes
-- Course level (undergraduate / postgraduate)
--->
+One or more texts that the concept map should be generated from.
 
 ## Notes and Limitations
-<!--
-Describe known limitations, edge cases, or contexts where this skill may not perform well.
--->
-
+* Due to the complexity of the task and the length of the skill instructions, use more capable models (e.g., Claude Opus) for better results. Anthropic/Claude models seem to work more consistently.
+* Generating the concept map can be token-intensive. Check your remaining available usage before proceeding.
+* Correcting mistakes in the output one at a time can be costly in terms of tokens, as the code for the concept map is regenerated entirely each time. Instead, consolidate all fixes and changes needed within the same prompt as far as possible.
 
 ## Attribution
 * Author:
-<!-- Your name and affiliation, e.g. "Jane Smith, LKCSB, SMU". -->
-
-* Contributors:
-<!-- Names of anyone who contributed to later versions, if applicable. --> 
-
-<!--
-If adapted from an existing skill from an external source, acknowledge the original author here.
-Example: "Adapted from [MCQ Designer](../mcq-designer/) by Jane Doe, Faculty of Science, University of the Sciences."
-Remove this section if this is an original skill.
--->
-
-## Contributing to the repository  
-You may contribute to our repository of skills by suggesting modifications to an existing skill or by proposing a new skill. Please refer to the [guidelines on contribution](https://github.com/SMU-AI-for-Education-Skills#contributing-to-the-skills-repository). 
-
+Isaac Koh, Centre for Teaching Excellence, SMU
